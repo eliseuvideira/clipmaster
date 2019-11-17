@@ -1,8 +1,9 @@
-const { app, Menu, Tray } = require('electron');
+const { app, Menu, Tray, systemPreferences } = require('electron');
 const path = require('path');
 
 /** @type {Electron.Tray | null} */
 let tray = null;
+const clippings = [];
 
 app.on('ready', () => {
   if (app.dock) {
@@ -15,18 +16,9 @@ app.on('ready', () => {
     tray.on('click', tray.popUpContextMenu);
   }
 
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'Quit',
-      click() {
-        app.quit();
-      },
-    },
-  ]);
+  updateMenu();
 
   tray.setToolTip('Clipmaster');
-
-  tray.setContextMenu(menu);
 });
 
 /** @type {() => string} */
@@ -35,7 +27,32 @@ const getIcon = () => {
     return 'icon-light@2x.ico';
   }
   if (process.platform === 'darwin') {
+    if (systemPreferences.isDarkMode()) {
+      return 'Icon-light.png';
+    }
     return 'icon-dark.png';
   }
   return 'Icon-light@2x.png';
+};
+
+const updateMenu = () => {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: 'Create New Clipping',
+      click() {
+        null;
+      },
+    },
+    { type: 'separator' },
+    ...clippings.map((clipping) => ({ label: clipping })),
+    { type: 'separator' },
+    {
+      label: 'Quit',
+      click() {
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setContextMenu(menu);
 };
