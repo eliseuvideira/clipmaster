@@ -45,7 +45,7 @@ const updateMenu = () => {
       },
     },
     { type: 'separator' },
-    ...clippings.map(createClippingMenuItem),
+    ...clippings.slice(0, 10).map(createClippingMenuItem),
     { type: 'separator' },
     {
       label: 'Quit',
@@ -61,14 +61,17 @@ const updateMenu = () => {
 
 const addClipping = () => {
   const clipping = clipboard.readText();
-  clippings.push(clipping);
+  if (clippings.includes(clipping)) {
+    return;
+  }
+  clippings.unshift(clipping);
   updateMenu();
   return clipping;
 };
 
 const createClippingMenuItem = (clipping, index) => {
   return {
-    label: clipping,
+    label: clipping.length > 20 ? clipping.slice(0, 20) + '...' : clipping,
     click() {
       clipboard.writeText(clipping);
     },
