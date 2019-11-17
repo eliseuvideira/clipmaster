@@ -1,0 +1,16 @@
+{
+  "name": "clipmaster",
+  "version": "1.0.0",
+  "main": "app/main.js",
+  "author": "Eliseu Videira <eliseuvideira1@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "1",
+    "eslint": "^6.6.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "eslint": "eslint",
+    "lint": "eslint app/**/*.js"
+  }
+}
