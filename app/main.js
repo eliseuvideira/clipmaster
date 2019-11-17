@@ -1,4 +1,4 @@
-const { app, Menu, Tray, systemPreferences } = require('electron');
+const { app, Menu, Tray, systemPreferences, clipboard } = require('electron');
 const path = require('path');
 
 /** @type {Electron.Tray | null} */
@@ -39,15 +39,17 @@ const updateMenu = () => {
   const menu = Menu.buildFromTemplate([
     {
       label: 'Create New Clipping',
+      accelerator: 'CommandOrControl+Shift+C',
       click() {
-        null;
+        addClipping();
       },
     },
     { type: 'separator' },
-    ...clippings.map((clipping) => ({ label: clipping })),
+    ...clippings.map(createClippingMenuItem),
     { type: 'separator' },
     {
       label: 'Quit',
+      accelerator: 'CommandOrControl+Q',
       click() {
         app.quit();
       },
@@ -55,4 +57,21 @@ const updateMenu = () => {
   ]);
 
   tray.setContextMenu(menu);
+};
+
+const addClipping = () => {
+  const clipping = clipboard.readText();
+  clippings.push(clipping);
+  updateMenu();
+  return clipping;
+};
+
+const createClippingMenuItem = (clipping, index) => {
+  return {
+    label: clipping,
+    click() {
+      clipboard.writeText(clipping);
+    },
+    accelerator: `CommandOrControl+${index}`,
+  };
 };
