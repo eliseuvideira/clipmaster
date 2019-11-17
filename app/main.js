@@ -1,19 +1,61 @@
-const { app, Menu, Tray, systemPreferences, clipboard } = require('electron');
+const {
+  app,
+  Menu,
+  Tray,
+  systemPreferences,
+  clipboard,
+  globalShortcut,
+  BrowserWindow,
+} = require('electron');
 const path = require('path');
 
 /** @type {Electron.Tray | null} */
 let tray = null;
 const clippings = [];
+let browserWindow = null;
 
 app.on('ready', () => {
   if (app.dock) {
     app.dock.hide();
   }
 
+  browserWindow = new BrowserWindow({ show: false });
+
+  browserWindow.loadURL(`file://${__dirname}/index.html`);
+
   tray = new Tray(path.join(__dirname, getIcon()));
 
   if (process.platform === 'win32') {
     tray.on('click', tray.popUpContextMenu);
+  }
+
+  const activationShortcut = globalShortcut.register(
+    'CommandOrControl+Option+C',
+    () => {
+      tray.popUpContextMenu();
+    },
+  );
+
+  if (!activationShortcut) {
+    console.error('Global activation shortcut failed to register');
+  }
+
+  const newClippingShortcut = globalShortcut.register(
+    'CommandOrControl+Shift+C',
+    () => {
+      const clipping = addClipping();
+      if (clipping) {
+        browserWindow.webContents.send(
+          'show-notification',
+          'Clipping Added',
+          clipping,
+        );
+      }
+    },
+  );
+
+  if (!newClippingShortcut) {
+    console.error('Global activation shortcut failed to register');
   }
 
   updateMenu();
