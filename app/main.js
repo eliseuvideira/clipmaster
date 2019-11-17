@@ -25,6 +25,8 @@ app.on('ready', () => {
 
   tray = new Tray(path.join(__dirname, getIcon()));
 
+  tray.setPressedImage(path.join(__dirname, 'Icon-light.png'));
+
   if (process.platform === 'win32') {
     tray.on('click', tray.popUpContextMenu);
   }
